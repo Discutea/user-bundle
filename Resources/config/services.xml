@@ -5,5 +5,10 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="Discutea\UserBundle\EventListener\PasswordListener">
+            <tag name="doctrine.event_listener" event="prePersist" />
+            <tag name="doctrine.event_listener" event="preUpdate" />
+        </service>
+
     </services>
 </container>
