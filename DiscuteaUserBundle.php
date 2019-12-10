@@ -2,7 +2,7 @@
 
 namespace Discutea\UserBundle;
 
-use Discutea\UserBundle\DependencyInjection\Compiler\DiscuteaUserExtension;
+use Discutea\UserBundle\DependencyInjection\DiscuteaUserExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class DiscuteaUserBundle extends Bundle
