@@ -21,7 +21,6 @@ class DiscuteaUserExtension extends Extension
             new FileLocator(__DIR__.'/../Resources/config')
         );
 
-        $loader->load('mapping/orm.xml');
         $loader->load('services.xml');
     }
 }

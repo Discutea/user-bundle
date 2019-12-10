@@ -3,57 +3,76 @@
 namespace Discutea\UserBundle\Entity;
 
 use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class User
  * @package Discutea\UserBundle\Entity
+ *
+ * @ORM\MappedSuperclass
+ *
  */
 abstract class User implements DiscuteaUserInterface, UserInterface
 {
-    protected $id;
-
     /**
      * @var string
+     * @ORM\Column(type="string", length=180, unique=true)
      */
     protected $username;
 
     /**
      * @var string
+     *
+     * @ORM\Column(type="string", length=180, unique=true)
      */
     protected $email;
 
     /**
      * @var bool
+     *
+     * @ORM\Column(type="boolean")
      */
     protected $enabled = false;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $salt;
 
     /**
      * @var string
+     *
+     * @ORM\Column(type="string")
      */
     protected $password;
 
     /**
      * @var \DateTime|null
+     *
+     * @ORM\Column(type="datetime", nullable=true)
      */
     protected $lastLogin;
 
     /**
      * @var string|null
+     *
+     * @ORM\Column(type="string", length=180, unique=true, nullable=true)
      */
     protected $confirmationToken;
 
     /**
      * @var \DateTime|null
+     *
+     * @ORM\Column(type="datetime", unique=true)
      */
     protected $passwordRequestedAt;
 
     /**
      * @var array
+     *
+     * @ORM\Column(type="json")
      */
     protected $roles = [];
 
@@ -61,14 +80,6 @@ abstract class User implements DiscuteaUserInterface, UserInterface
      * @var string|null
      */
     protected $plainPassword;
-
-    /**
-     * @return int|null
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     /**
      * @return string
