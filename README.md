@@ -16,10 +16,7 @@ Symfony user bundle
 
 security:
     encoders:
-        Symfony\Component\Security\Core\User\UserInterface:
-            algorithm:           sha256
-            encode_as_base64:    false
-            iterations:           10
+        Symfony\Component\Security\Core\User\UserInterface: sha512
 
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
@@ -45,4 +42,11 @@ security:
                 authenticators:
                     - Discutea\UserBundle\Security\FormLoginAuthenticator
 
+```
+
+```yaml
+# Add this in symfony recipes
+discutea_user:
+  resource: "@DiscuteaUserBundle/Controller/"
+  type: annotation
 ```
