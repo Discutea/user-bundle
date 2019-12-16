@@ -2,6 +2,7 @@
 
 namespace Discutea\UserBundle\Security;
 
+use Discutea\UserBundle\Util\UserClassFinder;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,7 +66,8 @@ class FormLoginAuthenticator extends AbstractFormLoginAuthenticator implements P
             throw new InvalidCsrfTokenException();
         }
 
-        $user = $this->entityManager->getRepository(UserInterface::class)->findOneBy(['email' => $credentials['email']]);
+
+        $user = $this->entityManager->getRepository(UserClassFinder::getClass())->findOneBy(['email' => $credentials['email']]);
 
         if (!$user) {
             // fail authentication with a custom error
