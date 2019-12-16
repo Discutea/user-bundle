@@ -5,10 +5,16 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <defaults autowire="true" autoconfigure="true" public="false"/>
+        <prototype namespace="Discutea\UserBundle\" resource="../../*" exclude="../../{DependencyInjection,Entity,Resources,DiscuteaUserBundle.php}"/>
+        <prototype namespace="Discutea\UserBundle\Controller\" resource="../../Controller">
+            <tag name="controller.service_arguments" />
+        </prototype>
+
         <service id="Discutea\UserBundle\EventListener\PasswordListener">
             <tag name="doctrine.event_listener" event="prePersist" />
             <tag name="doctrine.event_listener" event="preUpdate" />
         </service>
-
     </services>
+
 </container>
