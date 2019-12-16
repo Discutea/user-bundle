@@ -21,6 +21,9 @@ class DiscuteaUserExtension extends Extension
             new FileLocator(__DIR__.'/../Resources/config')
         );
 
+        $config = $this->processConfiguration(new Configuration(), $configs);
+        $container->setParameter('discutea_user.user_class', $config['user_class']);
+
         $loader->load('services.xml');
     }
 }

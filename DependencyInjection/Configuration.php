@@ -11,20 +11,12 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('discutea_user');
 
-        $supportedDrivers = array('orm', 'mongodb', 'couchdb', 'custom');
-
         $treeBuilder->getRootNode()
             ->children()
-                ->scalarNode('db_driver')
-                    ->validate()
-                        ->ifNotInArray($supportedDrivers)
-                        ->thenInvalid('The driver %s is not supported. Please choose one of '.json_encode($supportedDrivers))
-                    ->end()
-                    ->defaultValue('orm')
-                    ->cannotBeOverwritten()
-                    ->isRequired()
-                    ->cannotBeEmpty()
-                ->end()
+            ->scalarNode('user_class')
+            ->defaultValue('App\Entity\User')
+            ->cannotBeEmpty()
+            ->end()
             ->end()
         ;
 
