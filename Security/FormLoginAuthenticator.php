@@ -2,7 +2,6 @@
 
 namespace Discutea\UserBundle\Security;
 
-use Discutea\UserBundle\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,7 +38,7 @@ class FormLoginAuthenticator extends AbstractFormLoginAuthenticator implements P
 
     public function supports(Request $request)
     {
-        return 'app_login' === $request->attributes->get('_route')
+        return 'discutea_user_login' === $request->attributes->get('_route')
             && $request->isMethod('POST');
     }
 
@@ -50,6 +49,7 @@ class FormLoginAuthenticator extends AbstractFormLoginAuthenticator implements P
             'password' => $request->request->get('password'),
             'csrf_token' => $request->request->get('_csrf_token'),
         ];
+
         $request->getSession()->set(
             Security::LAST_USERNAME,
             $credentials['email']
@@ -65,7 +65,7 @@ class FormLoginAuthenticator extends AbstractFormLoginAuthenticator implements P
             throw new InvalidCsrfTokenException();
         }
 
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $credentials['email']]);
+        $user = $this->entityManager->getRepository(UserInterface::class)->findOneBy(['email' => $credentials['email']]);
 
         if (!$user) {
             // fail authentication with a custom error
@@ -100,6 +100,6 @@ class FormLoginAuthenticator extends AbstractFormLoginAuthenticator implements P
 
     protected function getLoginUrl()
     {
-        return $this->urlGenerator->generate('app_login');
+        return $this->urlGenerator->generate('discutea_user_login');
     }
 }
