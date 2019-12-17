@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}" />
+        <meta name="robots" content="noindex, nofollow" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <link rel="stylesheet" href="{{ asset('build/css/login.css') }}" />
+        <title>SOCOM - Réinitialisation</title>
+    </head>
+    <body id="login" class="login reset">
+        <h2 class="wrap">
+            <i class="icon-socom"></i>
+            <span>Mot de passe</span>
+        </h2>
+        {% trans_default_domain 'DiscuteaUserBundle' %}
+
+
+        {{ form_start(form, {'attr': { 'class': 'discutea_user_resetting_reset form-login wrap' }}) }}
+            {{ form_widget(form.plainPassword.first, {'attr': {'placeholder': 'Nouveau mot de passe', 'class': 'form-control'}}) }}
+            {{ form_widget(form.plainPassword.second, {'attr': {'placeholder': 'Ressaisissez votre mot de passe', 'class': 'form-control'}}) }}
+            {{ form_widget(form) }}
+            <input type="submit" value="Valider" />
+        {{ form_end(form) }}
+
+        <script src="{{ asset('/js/sweetalert2.min.js') }}"></script>
+        <script>
+            {% if form_errors(form.plainPassword.first) %}
+            swal('Erreur', '{{ form_errors(form.plainPassword.first) }}','error');
+            {% endif %}
+        </script>
+    </body>
+</html>

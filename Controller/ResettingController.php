@@ -1,0 +1,120 @@
+<?php
+
+namespace Discutea\UserBundle\Controller;
+
+use Discutea\UserBundle\Entity\DiscuteaUserInterface;
+use Discutea\UserBundle\Form\ResettingType;
+use Discutea\UserBundle\Mailer\UserMailer;
+use Discutea\UserBundle\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
+
+/**
+ * @Route("/resetting")
+ */
+class ResettingController extends AbstractController
+{
+    /**
+     * @Route("/request", name="discutea_user_resetting_request")
+     */
+    public function request()
+    {
+        return $this->render('@DiscuteaUser/resetting/request.html.twig');
+    }
+
+    /**
+     * @Route("/send-email", name="discutea_user_resetting_send_email", methods={"POST"})
+     *
+     * @param UserMailer $mailer
+     * @param Request $request
+     * @param TokenGeneratorInterface $tokenGenerator
+     * @param UserRepository $userRepository
+     * @param EntityManagerInterface $entityManager
+     * @param UrlGeneratorInterface $router
+     * @return RedirectResponse
+     * @throws \Exception
+     */
+    public function sendEmailAction(
+        UserMailer $mailer,
+        Request $request,
+        TokenGeneratorInterface $tokenGenerator,
+        UserRepository $userRepository,
+        EntityManagerInterface $entityManager,
+        UrlGeneratorInterface $router,
+        int $retryTtl
+    ) {
+        $username = $request->request->get('username');
+
+        $user = $userRepository->findOneBy(array('email' => $username));
+
+        if ($user instanceof DiscuteaUserInterface && !$user->isPasswordRequestNonExpired($retryTtl)) {
+            if (null === $user->getConfirmationToken()) {
+                $user->setConfirmationToken($tokenGenerator->generateToken());
+            }
+
+            $user->setPasswordRequestedAt(new \DateTime());
+
+            $mailer->sendResetting(
+                $user,
+                $router->generate('discutea_user_resetting_reset', array('confirmationToken' => $user->getConfirmationToken()), UrlGeneratorInterface::ABSOLUTE_URL)
+            );
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+        }
+
+        return new RedirectResponse($this->generateUrl('discutea_user_resetting_check_email', array('username' => $username)));
+    }
+
+    /**
+     * @Route("/check-email", name="discutea_user_resetting_check_email", methods={"GET"})
+     *
+     * @param Request $request
+     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function checkEmail(Request $request, int $retryTtl)
+    {
+        $username = $request->query->get('username');
+
+        if (empty($username)) {
+            return $this->redirectToRoute('discutea_user_resetting_request');
+        }
+
+        return $this->render('@DiscuteaUser/resetting/check_email.html.twig', array(
+            'tokenLifetime' => ceil($retryTtl / 3600),
+        ));
+    }
+
+    /**
+     * @Route("/reset/{confirmationToken}", name="discutea_user_resetting_reset", methods={"GET", "POST"})
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @param DiscuteaUserInterface $user
+     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function reset(Request $request, EntityManagerInterface $entityManager, DiscuteaUserInterface $user)
+    {
+        $form = $this->createForm(ResettingType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setPasswordRequestedAt(null);
+            $user->setConfirmationToken(null);
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('discutea_user_login');
+        }
+
+        return $this->render('@DiscuteaUser/resetting/reset.html.twig', array(
+            'user' => $user,
+            'form' => $form->createView(),
+        ));
+    }
+}

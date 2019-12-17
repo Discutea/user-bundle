@@ -23,6 +23,7 @@ class DiscuteaUserExtension extends Extension
 
         $config = $this->processConfiguration(new Configuration(), $configs);
         $container->setParameter('discutea_user.user_class', $config['user_class']);
+        $container->setParameter('discutea_user.resetting.retry_ttl', $config['retry_ttl']);
 
         $loader->load('services.xml');
     }

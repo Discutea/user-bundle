@@ -6,7 +6,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class User
  * @package Discutea\UserBundle\Entity
  *
  * @ORM\MappedSuperclass
@@ -82,7 +81,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     protected $plainPassword;
 
     /**
-     * @return string
+     * @see DiscuteaUserInterface
      */
     public function getUsername(): string
     {
@@ -90,10 +89,9 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @param string $username
-     * @return string
+     * @see DiscuteaUserInterface
      */
-    public function setUsername(string $username): string
+    public function setUsername(string $username): DiscuteaUserInterface
     {
         $this->username = $username;
 
@@ -101,7 +99,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @return string|null
+     * @see DiscuteaUserInterface
      */
     public function getEmail(): ?string
     {
@@ -109,8 +107,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @param string $email
-     * @return DiscuteaUserInterface
+     * @see DiscuteaUserInterface
      */
     public function setEmail(string $email): DiscuteaUserInterface
     {
@@ -120,7 +117,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @return bool
+     * @see DiscuteaUserInterface
      */
     public function isEnabled() : bool
     {
@@ -128,8 +125,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @param bool $enabled
-     * @return DiscuteaUserInterface
+     * @see DiscuteaUserInterface
      */
     public function setEnabled(bool $enabled) : DiscuteaUserInterface
     {
@@ -147,8 +143,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @param string|null $salt
-     * @return DiscuteaUserInterface
+     * @see DiscuteaUserInterface
      */
     public function setSalt(?string $salt): DiscuteaUserInterface
     {
@@ -166,8 +161,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @param string $password
-     * @return DiscuteaUserInterface
+     * @see DiscuteaUserInterface
      */
     public function setPassword(string $password): DiscuteaUserInterface
     {
@@ -177,7 +171,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @return \DateTime|null
+     * @see DiscuteaUserInterface
      */
     public function getLastLogin(): ?\DateTime
     {
@@ -185,8 +179,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @param \DateTime|null $lastLogin
-     * @return User
+     * @see DiscuteaUserInterface
      */
     public function setLastLogin(?\DateTime $lastLogin): DiscuteaUserInterface
     {
@@ -196,7 +189,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @return string|null
+     * @see DiscuteaUserInterface
      */
     public function getConfirmationToken(): ?string
     {
@@ -204,8 +197,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @param string|null $confirmationToken
-     * @return User
+     * @see DiscuteaUserInterface
      */
     public function setConfirmationToken(?string $confirmationToken): DiscuteaUserInterface
     {
@@ -215,7 +207,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @return \DateTime|null
+     * @see DiscuteaUserInterface
      */
     public function getPasswordRequestedAt(): ?\DateTime
     {
@@ -223,8 +215,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @param \DateTime|null $passwordRequestedAt
-     * @return User
+     * @see DiscuteaUserInterface
      */
     public function setPasswordRequestedAt(?\DateTime $passwordRequestedAt): DiscuteaUserInterface
     {
@@ -246,8 +237,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @param array $roles
-     * @return DiscuteaUserInterface
+     * @see DiscuteaUserInterface
      */
     public function setRoles(array $roles): DiscuteaUserInterface
     {
@@ -257,7 +247,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @return string|null
+     * @see DiscuteaUserInterface
      */
     public function getPlainPassword(): ?string
     {
@@ -265,10 +255,9 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     }
 
     /**
-     * @param string|null $plainPassword
-     * @return User
+     * @see DiscuteaUserInterface
      */
-    public function setPlainPassword(?string $plainPassword): self
+    public function setPlainPassword(?string $plainPassword): DiscuteaUserInterface
     {
         $this->plainPassword = $plainPassword;
 
@@ -282,5 +271,14 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         $this->plainPassword = null;
+    }
+
+    /**
+     * @see DiscuteaUserInterface
+     */
+    public function isPasswordRequestNonExpired(int $ttl): bool
+    {
+        return $this->getPasswordRequestedAt() instanceof \DateTime &&
+            $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
     }
 }

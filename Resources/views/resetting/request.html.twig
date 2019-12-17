@@ -1,0 +1,28 @@
+{% trans_default_domain 'DiscuteaUserBundle' %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}"/>
+        <meta name="robots" content="noindex, nofollow"/>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="stylesheet" href="{{ asset('build/css/login.css') }}"/>
+        <title>SOCOM - Réinitialisation</title>
+    </head>
+    <body id="login" class="login">
+        <h2 class="wrap">
+            <i class="icon-socom"></i>
+            <span>Réinitialisation</span>
+        </h2>
+        <form action="{{ path('app_resetting_send_email') }}" method="POST"
+              class="form-login discutea_user_resetting_request wrap">
+            <label for="username">
+                <input type="email" id="username" name="username" placeholder="Adresse e-mail" required/>
+                <i class="icon-user"></i>
+            </label>
+            <input type="submit" id="_submit" name="_submit" value="Réinitialiser"/>
+        </form>
+        <a class="i-forgot" href="{{ path('app_login') }}" id="forget-pwd">Connexion</a>
+    </body>
+</html>

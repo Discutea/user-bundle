@@ -13,10 +13,13 @@ class Configuration implements ConfigurationInterface
 
         $treeBuilder->getRootNode()
             ->children()
-            ->scalarNode('user_class')
-            ->defaultValue('App\Entity\User')
-            ->cannotBeEmpty()
-            ->end()
+                ->scalarNode('user_class')
+                    ->defaultValue('App\Entity\User')
+                    ->cannotBeEmpty()
+                ->end()
+                ->integerNode('retry_ttl')
+                    ->defaultValue(7200)
+                ->end()
             ->end()
         ;
 
