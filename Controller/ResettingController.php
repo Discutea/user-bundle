@@ -33,24 +33,23 @@ class ResettingController extends AbstractController
      * @param UserMailer $mailer
      * @param Request $request
      * @param TokenGeneratorInterface $tokenGenerator
-     * @param UserRepository $userRepository
      * @param EntityManagerInterface $entityManager
      * @param UrlGeneratorInterface $router
      * @return RedirectResponse
      * @throws \Exception
      */
-    public function sendEmailAction(
+    public function sendEmail(
         UserMailer $mailer,
         Request $request,
         TokenGeneratorInterface $tokenGenerator,
-        UserRepository $userRepository,
         EntityManagerInterface $entityManager,
         UrlGeneratorInterface $router,
-        int $retryTtl
+        int $retryTtl,
+        string $userClass
     ) {
         $username = $request->request->get('username');
 
-        $user = $userRepository->findOneBy(array('email' => $username));
+        $user = $entityManager->getRepository($userClass)->findOneBy(array('email' => $username));
 
         if ($user instanceof DiscuteaUserInterface && !$user->isPasswordRequestNonExpired($retryTtl)) {
             if (null === $user->getConfirmationToken()) {
@@ -98,8 +97,14 @@ class ResettingController extends AbstractController
      * @param DiscuteaUserInterface $user
      * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function reset(Request $request, EntityManagerInterface $entityManager, DiscuteaUserInterface $user)
+    public function reset(Request $request, EntityManagerInterface $entityManager, string $userClass, string $confirmationToken)
     {
+        $user = $entityManager->getRepository($userClass)->findOneBy(array('confirmationToken' => $confirmationToken));
+
+        if (!$user instanceof DiscuteaUserInterface) {
+            throw $this->createNotFoundException('Not found');
+        }
+
         $form = $this->createForm(ResettingType::class, $user);
         $form->handleRequest($request);
 

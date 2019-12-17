@@ -4,16 +4,18 @@ namespace Discutea\UserBundle\EventListener;
 
 use Discutea\UserBundle\Entity\DiscuteaUserInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Encoder\SelfSaltingEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class PasswordListener
 {
-    private $passwordEncoder;
+    private $encoderFactory;
 
-    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(EncoderFactoryInterface $encoderFactory)
     {
-        $this->passwordEncoder = $passwordEncoder;
+        $this->encoderFactory = $encoderFactory;
     }
 
     /**
@@ -47,12 +49,25 @@ class PasswordListener
      */
     private function updatePassword(DiscuteaUserInterface $user): void
     {
+        if (0 === strlen($user->getPlainPassword())) {
+            return;
+        }
+
         if (!$user instanceof UserInterface) {
             throw new \LogicException('This entity is not a valid user.');
         }
 
-        if ($this->passwordEncoder->isPasswordValid($user, $user->getPlainPassword())) {
-            $this->passwordEncoder->encodePassword($user, $user->getPlainPassword());
+        $encoder = $this->encoderFactory->getEncoder($user);
+
+        if ($encoder instanceof BCryptPasswordEncoder || $encoder instanceof SelfSaltingEncoderInterface) {
+            $user->setSalt(null);
+        } else {
+            $salt = rtrim(str_replace('+', '.', base64_encode(random_bytes(32))), '=');
+            $user->setSalt($salt);
         }
+
+        $hashedPassword = $encoder->encodePassword($user->getPlainPassword(), $user->getSalt());
+        $user->setPassword($hashedPassword);
+        $user->eraseCredentials();
     }
 }
