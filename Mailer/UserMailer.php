@@ -25,7 +25,7 @@ class UserMailer
      */
     public function sendResetting(DiscuteaUserInterface $user, string $url): void
     {
-        $html = $this->twig->render("email/user/resetting.mjml.twig", ['user' => $user, 'confirmationUrl' => $url]);
+        $html = $this->twig->render("@DiscuteaUser/email/resetting.html.twig", ['user' => $user, 'confirmationUrl' => $url]);
 
         $email = (new Email())
             ->from('test@discutea.com')
