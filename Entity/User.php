@@ -64,7 +64,7 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     /**
      * @var \DateTime|null
      *
-     * @ORM\Column(type="datetime", unique=true)
+     * @ORM\Column(type="datetime", nullable=true)
      */
     protected $passwordRequestedAt;
 

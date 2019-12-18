@@ -4,7 +4,6 @@ namespace Discutea\UserBundle\EventListener;
 
 use Discutea\UserBundle\Entity\DiscuteaUserInterface;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\SelfSaltingEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -45,7 +44,8 @@ class PasswordListener
     }
 
     /**
-     * {@inheritdoc}
+     * @param DiscuteaUserInterface $user
+     * @throws \Exception
      */
     private function updatePassword(DiscuteaUserInterface $user): void
     {
@@ -59,11 +59,10 @@ class PasswordListener
 
         $encoder = $this->encoderFactory->getEncoder($user);
 
-        if ($encoder instanceof BCryptPasswordEncoder || $encoder instanceof SelfSaltingEncoderInterface) {
+        if ($encoder instanceof SelfSaltingEncoderInterface) {
             $user->setSalt(null);
         } else {
-            $salt = rtrim(str_replace('+', '.', base64_encode(random_bytes(32))), '=');
-            $user->setSalt($salt);
+            $user->setSalt(random_bytes(10));
         }
 
         $hashedPassword = $encoder->encodePassword($user->getPlainPassword(), $user->getSalt());

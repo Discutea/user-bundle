@@ -15,7 +15,9 @@
         "doctrine/orm": "^2.5.11",
         "symfony/form": ">=4.4 || ^5.0",
         "symfony/framework-bundle": ">=4.4 || ^5.0",
-        "symfony/security-bundle": ">=4.4 || ^5.0"
+        "symfony/mailer": ">=4.4 || ^5.0",
+        "symfony/security-bundle": ">=4.4 || ^5.0",
+        "twig/twig": "^3.0"
     },
     "autoload": {
         "psr-4": { "Discutea\\UserBundle\\": "" },
@@ -24,6 +26,7 @@
         ]
     },
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "config": {
         "sort-packages": true
     }
