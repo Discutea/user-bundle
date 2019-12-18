@@ -6,8 +6,7 @@
 
     <services>
         <defaults autowire="true" autoconfigure="true" public="false">
-            <bind key="$retryTtl">%discutea_user.resetting.retry_ttl%</bind>
-            <bind key="$userClass">%discutea_user.user_class%</bind>
+            <bind key="$discuteaUserConfig">%discutea_user.configuration%</bind>
         </defaults>
         <prototype namespace="Discutea\UserBundle\" resource="../../*" exclude="../../{DependencyInjection,Entity,Resources,DiscuteaUserBundle.php}"/>
         <prototype namespace="Discutea\UserBundle\Controller\" resource="../../Controller">

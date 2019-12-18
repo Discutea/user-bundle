@@ -9,10 +9,32 @@ use Twig\Environment;
 
 class UserMailer
 {
-    public function __construct(MailerInterface $mailer, Environment $twig)
+    /**
+     * @var MailerInterface
+     */
+    private $mailer;
+
+    /**
+     * @var Environment
+     */
+    private $twig;
+
+    /**
+     * @var array
+     */
+    private $discuteaUserConfig;
+
+    /**
+     * UserMailer constructor.
+     * @param MailerInterface $mailer
+     * @param Environment $twig
+     * @param array $discuteaUserConfig
+     */
+    public function __construct(MailerInterface $mailer, Environment $twig, array $discuteaUserConfig)
     {
         $this->mailer = $mailer;
         $this->twig = $twig;
+        $this->discuteaUserConfig = $discuteaUserConfig;
     }
 
     /**
@@ -28,7 +50,7 @@ class UserMailer
         $html = $this->twig->render("@DiscuteaUser/email/resetting.html.twig", ['user' => $user, 'confirmationUrl' => $url]);
 
         $email = (new Email())
-            ->from('test@discutea.com')
+            ->from($this->discuteaUserConfig['from_email_address'])
             ->to($user->getEmail())
             ->subject('Réinitialisation de votre mot de passe')
             ->html($html);

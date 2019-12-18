@@ -30,13 +30,19 @@ class FormLoginAuthenticator extends AbstractFormLoginAuthenticator implements P
     private $passwordEncoder;
     private $userClass;
 
-    public function __construct(EntityManagerInterface $entityManager, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, UserPasswordEncoderInterface $passwordEncoder, ParameterBagInterface $parameterBag)
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        UrlGeneratorInterface $urlGenerator,
+        CsrfTokenManagerInterface $csrfTokenManager,
+        UserPasswordEncoderInterface $passwordEncoder,
+        array $discuteaUserConfig
+    )
     {
         $this->entityManager = $entityManager;
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
         $this->passwordEncoder = $passwordEncoder;
-        $this->userClass = $parameterBag->get('discutea_user.user_class');
+        $this->userClass = $discuteaUserConfig['user_class'];
     }
 
     public function supports(Request $request)

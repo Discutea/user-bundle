@@ -44,14 +44,13 @@ class ResettingController extends AbstractController
         TokenGeneratorInterface $tokenGenerator,
         EntityManagerInterface $entityManager,
         UrlGeneratorInterface $router,
-        int $retryTtl,
-        string $userClass
+        array $discuteaUserConfig
     ) {
         $username = $request->request->get('username');
 
-        $user = $entityManager->getRepository($userClass)->findOneBy(array('email' => $username));
+        $user = $entityManager->getRepository($discuteaUserConfig['user_class'])->findOneBy(array('email' => $username));
 
-        if ($user instanceof DiscuteaUserInterface && !$user->isPasswordRequestNonExpired($retryTtl)) {
+        if ($user instanceof DiscuteaUserInterface && !$user->isPasswordRequestNonExpired($discuteaUserConfig['retry_ttl'])) {
             if (null === $user->getConfirmationToken()) {
                 $user->setConfirmationToken($tokenGenerator->generateToken());
             }
@@ -76,7 +75,7 @@ class ResettingController extends AbstractController
      * @param Request $request
      * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function checkEmail(Request $request, int $retryTtl)
+    public function checkEmail(Request $request, array $discuteaUserConfig)
     {
         $username = $request->query->get('username');
 
@@ -85,7 +84,7 @@ class ResettingController extends AbstractController
         }
 
         return $this->render('@DiscuteaUser/resetting/check_email.html.twig', array(
-            'tokenLifetime' => ceil($retryTtl / 3600),
+            'tokenLifetime' => ceil($discuteaUserConfig['retry_ttl'] / 3600),
         ));
     }
 
@@ -97,9 +96,9 @@ class ResettingController extends AbstractController
      * @param DiscuteaUserInterface $user
      * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function reset(Request $request, EntityManagerInterface $entityManager, string $userClass, string $confirmationToken)
+    public function reset(Request $request, EntityManagerInterface $entityManager, array $discuteaUserConfig, string $confirmationToken)
     {
-        $user = $entityManager->getRepository($userClass)->findOneBy(array('confirmationToken' => $confirmationToken));
+        $user = $entityManager->getRepository($discuteaUserConfig['user_class'])->findOneBy(array('confirmationToken' => $confirmationToken));
 
         if (!$user instanceof DiscuteaUserInterface) {
             throw $this->createNotFoundException('Not found');
