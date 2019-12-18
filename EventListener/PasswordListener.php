@@ -62,7 +62,8 @@ class PasswordListener
         if ($encoder instanceof SelfSaltingEncoderInterface) {
             $user->setSalt(null);
         } else {
-            $user->setSalt(random_bytes(10));
+            $salt = rtrim(str_replace('+', '.', base64_encode(random_bytes(32))), '=');
+            $user->setSalt($salt);
         }
 
         $hashedPassword = $encoder->encodePassword($user->getPlainPassword(), $user->getSalt());
