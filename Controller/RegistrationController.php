@@ -46,7 +46,7 @@ class RegistrationController extends AbstractController
     }
 
     /**
-     * @Route("/send-email", name="discutea_user_registration_send_email", methods={"GET"})
+     * @Route("/send-email/{username}", name="discutea_user_registration_send_email", methods={"GET"})
      *
      * @param UserMailer $mailer
      * @param Request $request
@@ -61,29 +61,64 @@ class RegistrationController extends AbstractController
      */
     public function sendEmail(
         UserMailer $mailer,
-        Request $request,
+        string $username,
         EntityManagerInterface $entityManager,
         UrlGeneratorInterface $router,
         array $discuteaUserConfig
     ) : Response {
-        $username = $request->request->get('username');
-
         $user = $entityManager->getRepository($discuteaUserConfig['user_class'])->findOneBy(array('username' => $username));
 
-        if ($user instanceof DiscuteaUserInterface && !$user->isEnabled()) {
-            $user->setPasswordRequestedAt(new \DateTime());
-
-            $mailer->sendConfirmation(
-                $user,
-                $router->generate('discutea_user_registration_check_email', array('confirmationToken' => $user->getConfirmationToken()), UrlGeneratorInterface::ABSOLUTE_URL)
-            );
-
-            $entityManager->persist($user);
-            $entityManager->flush();
+        if (!$user instanceof DiscuteaUserInterface || $user->isEnabled()) {
+            throw $this->createAccessDeniedException('Oops');
         }
+
+        $user->setPasswordRequestedAt(new \DateTime());
+
+        $mailer->sendConfirmation(
+            $user,
+            $router->generate('discutea_user_registration_check_email', array(
+                'confirmationToken' => $user->getConfirmationToken(),
+                'email'             => $user->getEmail()
+            ), UrlGeneratorInterface::ABSOLUTE_URL)
+        );
 
         return $this->render('@DiscuteaUser/registration/confirmation.html.twig', [
             'email' => $user->getEmail()
         ]);
+    }
+
+    /**
+     * @Route("/check-email/{confirmationToken}/{email}", name="discutea_user_registration_check_email", methods={"GET"})
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param array $discuteaUserConfig
+     * @param string $confirmationToken
+     * @param string $email
+     * @return Response
+     */
+    public function checkEmail(
+        EntityManagerInterface $entityManager,
+        array $discuteaUserConfig,
+        string $confirmationToken,
+        string $email
+    ) : Response {
+        $user = $entityManager->getRepository($discuteaUserConfig['user_class'])->findOneBy(array(
+            'confirmationToken' => $confirmationToken,
+            'email' => $email
+        ));
+
+        if (!$user instanceof DiscuteaUserInterface || $user->isEnabled()) {
+            throw $this->createAccessDeniedException('Oops');
+        }
+
+        $user->setConfirmationToken(null);
+        $user->setEnabled(true);
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        $this->addFlash('info', 'Vous pouvez maintenant vous connecter.');
+
+        return new RedirectResponse($this->generateUrl('discutea_user_login', array('username' => $user->getUsername())));
     }
 }
