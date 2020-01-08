@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Validator;
+namespace Discutea\UserBundle\Validator;
 
 use Symfony\Component\Validator\Constraint;
 
