@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 /**
  * @Route("/registration")
@@ -16,7 +17,7 @@ class RegistrationController extends AbstractController
     /**
      * @Route("/register", name="discutea_user_registration_register")
      */
-    public function registration(Request $request, array $discuteaUserConfig): Response
+    public function registration(Request $request, TokenGeneratorInterface $tokenGenerator, array $discuteaUserConfig): Response
     {
         $class = $discuteaUserConfig['user_class'];
         $user = new $class();
@@ -25,6 +26,7 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user->setConfirmationToken($tokenGenerator->generateToken());
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($user);
             $entityManager->flush();
