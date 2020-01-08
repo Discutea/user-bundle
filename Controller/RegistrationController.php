@@ -117,8 +117,6 @@ class RegistrationController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
-        $this->addFlash('info', 'Vous pouvez maintenant vous connecter.');
-
-        return new RedirectResponse($this->generateUrl('discutea_user_login', array('username' => $user->getUsername())));
+        return $this->render('@DiscuteaUser/registration/confirmed.html.twig');
     }
 }
