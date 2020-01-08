@@ -57,4 +57,25 @@ class UserMailer
 
         $this->mailer->send($email);
     }
+
+    /**
+     * @param DiscuteaUserInterface $user
+     * @param string $url
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function sendConfirmation(DiscuteaUserInterface $user, string $url): void
+    {
+        $html = $this->twig->render("@DiscuteaUser/email/confirmation.html.twig", ['user' => $user, 'confirmationUrl' => $url]);
+
+        $email = (new Email())
+            ->from($this->discuteaUserConfig['from_email_address'])
+            ->to($user->getEmail())
+            ->subject('Confirmation de votre inscription')
+            ->html($html);
+
+        $this->mailer->send($email);
+    }
 }

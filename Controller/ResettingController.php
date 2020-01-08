@@ -5,7 +5,6 @@ namespace Discutea\UserBundle\Controller;
 use Discutea\UserBundle\Entity\DiscuteaUserInterface;
 use Discutea\UserBundle\Form\ResettingType;
 use Discutea\UserBundle\Mailer\UserMailer;
-use Discutea\UserBundle\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -35,8 +34,12 @@ class ResettingController extends AbstractController
      * @param TokenGeneratorInterface $tokenGenerator
      * @param EntityManagerInterface $entityManager
      * @param UrlGeneratorInterface $router
+     * @param array $discuteaUserConfig
      * @return RedirectResponse
-     * @throws \Exception
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
     public function sendEmail(
         UserMailer $mailer,
@@ -93,7 +96,8 @@ class ResettingController extends AbstractController
      *
      * @param Request $request
      * @param EntityManagerInterface $entityManager
-     * @param DiscuteaUserInterface $user
+     * @param array $discuteaUserConfig
+     * @param string $confirmationToken
      * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function reset(Request $request, EntityManagerInterface $entityManager, array $discuteaUserConfig, string $confirmationToken)
