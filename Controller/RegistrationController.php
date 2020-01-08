@@ -16,11 +16,10 @@ class RegistrationController extends AbstractController
     /**
      * @Route("/register", name="discutea_user_registration_register")
      */
-    public function registration(Request $request): Response
+    public function registration(Request $request, array $discuteaUserConfig): Response
     {
-        $class = $this->getParameter('discutea_user.user_class');
+        $class = $discuteaUserConfig['user_class'];
         $user = new $class();
-
 
         $form = $this->createForm(RegistrationType::class, $user);
         $form->handleRequest($request);

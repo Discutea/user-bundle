@@ -4,12 +4,15 @@ namespace Discutea\UserBundle\Entity;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Discutea\UserBundle\Validator as DiscuteaAssert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @package Discutea\UserBundle\Entity
  *
  * @ORM\MappedSuperclass
- *
+ * @UniqueEntity("username")
+ * @UniqueEntity("email")
  */
 abstract class User implements DiscuteaUserInterface, UserInterface
 {
@@ -76,6 +79,8 @@ abstract class User implements DiscuteaUserInterface, UserInterface
     protected $roles = [];
 
     /**
+     * @DiscuteaAssert\Password
+     *
      * @var string|null
      */
     protected $plainPassword;
