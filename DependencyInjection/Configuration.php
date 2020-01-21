@@ -7,6 +7,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    const ALIAS = 'md_socom';
+
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder('discutea_user');
